@@ -1,0 +1,40 @@
+# ---- Security ----
+# Never commit SSH keys or credentials
+*.pem
+*.key
+id_rsa
+id_ed25519
+tc3
+tc3.pub
+*.pub
+
+# AWS CLI creds (should live only in ~/.aws/)
+.aws/
+
+# ---- Terraform ----
+*.tfstate
+*.tfstate.backup
+.terraform/
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# tfvars often contain secrets (access keys, paths, etc.)
+terraform.tfvars
+*.tfvars
+
+# ---- Ansible ----
+*.retry
+
+# ---- OS / IDE ----
+.DS_Store
+.vscode/
+.idea/
+
+# Python / misc
+__pycache__/
+*.pyc
+.DS_Store
+

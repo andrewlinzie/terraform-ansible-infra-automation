@@ -1,0 +1,47 @@
+---
+- name: Configure web server and deploy Hello World
+  hosts: web
+  become: true
+
+  pre_tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+  tasks:
+    - name: Ensure Nginx is installed (Ubuntu/Debian)
+      apt:
+        name: nginx
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Ensure Nginx is running and enabled
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+
+    - name: Deploy simple Hello World page
+      copy:
+        dest: /var/www/html/index.html
+        content: |
+          <!doctype html>
+          <html>
+          <head><meta charset="utf-8"><title>Hello</title></head>
+          <body style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 2rem;">
+            <h1>Hello, World!</h1>
+            <p>Deployed via Ansible on an Ubuntu EC2 instance.</p>
+          </body>
+          </html>
+
+    - name: Verify Nginx is responding locally
+      uri:
+        url: "http://localhost/"
+        return_content: yes
+      register: homepage
+
+    - name: Assert homepage contains 'Hello, World!'
+      assert:
+        that:
+          - "'Hello, World!' in homepage.content"
