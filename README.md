@@ -80,6 +80,7 @@ cp terraform.tfvars.example terraform.tfvars
 ### 4) Deploy Infrastructure
 
 ```bash
+cd terraform
 terraform init
 terraform plan
 terraform apply -auto-approve
@@ -87,11 +88,10 @@ terraform apply -auto-approve
 
 **Outputs** will show the EC2 public IP and a convenience URL.
 
-```
+```bash
 terraform -chdir=terraform output -raw public_ip
 terraform -chdir=terraform output -raw web_url
 terraform -chdir=terraform output -raw bucket_name
-```
 
 Example:
 
@@ -99,7 +99,7 @@ Example:
 public_ip = "3.91.x.y"
 web_url   = "http://3.91.x.y/"
 bucket_name = "tc3-ab12cd"
-```
+
 
 ### 5) Prepare Ansible Inventory
 
@@ -161,19 +161,37 @@ You should see the “Hello, World!” page.
 
 **Repo:** https://github.com/andrewlinzie/TechChallenge3.git 
 
-**Reproduce (one-liners):**
-1. `terraform -chdir=terraform init && terraform -chdir=terraform apply -auto-approve`
-2. `./scripts/write_inventory.sh /Users/andrewlinzie/.ssh/tc3`
+---
+
+## Quick reproduce (one-liners)
+1. `cd terraform && terraform init && terraform apply -auto-approve`
+2. `./scripts/write_inventory.sh /ABSOLUTE/PATH/TO/your_private_key`
 3. `cd ansible && ansible-playbook site.yml`
-
-**Security note:**  
-SSH access is restricted to my IP (`allow_ssh_cidr` set to 107.128.38.198/32).
-If graders need SSH, they should provide their IP to be temporarily added.
-
+4. `terraform -chdir=terraform output -raw web_url`  # shows the hosted page URL
 
 ---
 
-## Teardown (Stop AWS charges)
+## Security & Notes
+
+**Security**
+- SSH access is currently restricted to my IP in the security group (`allow_ssh_cidr`).
+- To re-open SSH for grading, change `terraform/terraform.tfvars` `allow_ssh_cidr` to the grader IP and run `terraform apply`.
+- Do **not** commit private keys or `*.tfstate*`. See `.gitignore`.
+
+**Quick commands**
+```bash
+# get your public IP
+curl ifconfig.me
+
+# lock SSH to your IP (example)
+# edit terraform/terraform.tfvars:
+# allow_ssh_cidr = "<YOUR_IP>/32"
+terraform -chdir=terraform plan
+terraform -chdir=terraform apply -auto-approve
+
+---
+
+## Teardown (stop AWS charges)
 
 See [`docs/TEARDOWN.md`](docs/TEARDOWN.md). Quick command:
 
@@ -182,23 +200,6 @@ terraform -chdir=terraform destroy -auto-approve
 ```
 
 > The S3 bucket is created with `force_destroy = true`, so Terraform deletes objects and the bucket automatically.
-
----
-
-## Notes
-
-- Security group allows SSH (22) from `allow_ssh_cidr` and HTTP (80) from `allow_http_cidr`.
-- For testing, SSH may be set to `0.0.0.0/0`.  
-⚠️ For submission, it has been restricted to my home IP (`107.128.38.198/32`).
-  
-```bash
-curl ifconfig.me   # get your public IP
-# update terraform.tfvars
-allow_ssh_cidr = "<YOUR_IP>/32"
-
-- EC2 gets an Instance Profile with S3 read/list permissions for the created bucket (useful if you later want to pull content).
-- Uses default VPC and first subnet — fine for this single-instance demo.
-
 
 ---
 
