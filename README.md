@@ -159,7 +159,7 @@ You should see the “Hello, World!” page.
 
 **Live page URL:** http://44.202.38.69/
 
-**Repo:** https://github.com/andrewlinzie/TechChallenge3  # <-- your private repo URL
+**Repo:** https://github.com/andrewlinzie/TechChallenge3.git 
 
 **Reproduce (one-liners):**
 1. `terraform -chdir=terraform init && terraform -chdir=terraform apply -auto-approve`
@@ -167,7 +167,7 @@ You should see the “Hello, World!” page.
 3. `cd ansible && ansible-playbook site.yml`
 
 **Security note:**  
-SSH access is restricted to my IP (`allow_ssh_cidr` set to `<YOUR_IP>/32`).  
+SSH access is restricted to my IP (`allow_ssh_cidr` set to 107.128.38.198/32).
 If graders need SSH, they should provide their IP to be temporarily added.
 
 
@@ -189,13 +189,12 @@ terraform -chdir=terraform destroy -auto-approve
 
 - Security group allows SSH (22) from `allow_ssh_cidr` and HTTP (80) from `allow_http_cidr`.
 - For testing, SSH may be set to `0.0.0.0/0`.  
-  ⚠️ For submission, it has been restricted to my home IP (`xxx.xxx.xxx.xxx/32`).
-
-  ```
-  curl ifconfig.me   # get your public IP
-  # update terraform.tfvars
-  allow_ssh_cidr = "<YOUR_IP>/32"
-  ```
+⚠️ For submission, it has been restricted to my home IP (`107.128.38.198/32`).
+  
+```bash
+curl ifconfig.me   # get your public IP
+# update terraform.tfvars
+allow_ssh_cidr = "<YOUR_IP>/32"
 
 - EC2 gets an Instance Profile with S3 read/list permissions for the created bucket (useful if you later want to pull content).
 - Uses default VPC and first subnet — fine for this single-instance demo.
