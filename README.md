@@ -155,6 +155,24 @@ You should see the “Hello, World!” page.
 
 ---
 
+## Submission Details
+
+**Live page URL:** http://44.202.38.69/
+
+**Repo:** https://github.com/andrewlinzie/TechChallenge3  # <-- your private repo URL
+
+**Reproduce (one-liners):**
+1. `terraform -chdir=terraform init && terraform -chdir=terraform apply -auto-approve`
+2. `./scripts/write_inventory.sh /Users/andrewlinzie/.ssh/tc3`
+3. `cd ansible && ansible-playbook site.yml`
+
+**Security note:**  
+SSH access is restricted to my IP (`allow_ssh_cidr` set to `<YOUR_IP>/32`).  
+If graders need SSH, they should provide their IP to be temporarily added.
+
+
+---
+
 ## Teardown (Stop AWS charges)
 
 See [`docs/TEARDOWN.md`](docs/TEARDOWN.md). Quick command:
@@ -170,8 +188,8 @@ terraform -chdir=terraform destroy -auto-approve
 ## Notes
 
 - Security group allows SSH (22) from `allow_ssh_cidr` and HTTP (80) from `allow_http_cidr`.
-- For testing, allow_ssh_cidr may be 0.0.0.0/0.
-  - ⚠️ Best practice: restrict to your own IP before sharing:
+- For testing, SSH may be set to `0.0.0.0/0`.  
+  ⚠️ For submission, it has been restricted to my home IP (`xxx.xxx.xxx.xxx/32`).
 
   ```
   curl ifconfig.me   # get your public IP
@@ -182,16 +200,19 @@ terraform -chdir=terraform destroy -auto-approve
 - EC2 gets an Instance Profile with S3 read/list permissions for the created bucket (useful if you later want to pull content).
 - Uses default VPC and first subnet — fine for this single-instance demo.
 
+
 ---
 
 ## Troubleshooting
 
 - Terraform error: no matching VPC found
   → Run aws ec2 create-default-vpc --region us-east-1 to create one.
+
 - SSH/Ansible ping fails
   - Ensure Security Group allows your IP (allow_ssh_cidr)
   - Confirm private key permissions: chmod 600 ~/.ssh/tc3
   - Ensure correct user (ubuntu for Ubuntu AMIs)
+
 - Nginx not serving page
   - SSH in: ssh -i ~/.ssh/tc3 ubuntu@<PUBLIC_IP>
   - Check service: sudo systemctl status nginx
