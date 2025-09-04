@@ -85,7 +85,15 @@ terraform plan
 terraform apply -auto-approve
 ```
 
-**Outputs** will show the EC2 public IP and a convenience URL. Example:
+**Outputs** will show the EC2 public IP and a convenience URL.
+
+```
+terraform -chdir=terraform output -raw public_ip
+terraform -chdir=terraform output -raw web_url
+terraform -chdir=terraform output -raw bucket_name
+```
+
+Example:
 
 ```
 public_ip = "3.91.x.y"
@@ -139,9 +147,11 @@ You should see the “Hello, World!” page.
 ## Submission Checklist
 
 - [ ] Private GitHub repo with this project structure and code
+- [ ] .gitignore excludes private keys (~/.ssh/*) and *.tfstate
 - [ ] **README** (this file) included
-- [ ] Share the repo with your mentor
-- [ ] Provide the **URL** of the hosted page (from `web_url` output)
+- [ ] Share the repo with your mentor/evaluator
+- [ ] Provide the URL of the hosted page (from terraform -chdir=terraform output -raw web_url)
+- [ ] Provide any notes on region, key path, or instance type changes
 
 ---
 
@@ -160,5 +170,29 @@ terraform -chdir=terraform destroy -auto-approve
 ## Notes
 
 - Security group allows SSH (22) from `allow_ssh_cidr` and HTTP (80) from `allow_http_cidr`.
+- For testing, allow_ssh_cidr may be 0.0.0.0/0.
+  - ⚠️ Best practice: restrict to your own IP before sharing:
+
+  ```
+  curl ifconfig.me   # get your public IP
+  # update terraform.tfvars
+  allow_ssh_cidr = "<YOUR_IP>/32"
+  ```
+
 - EC2 gets an Instance Profile with S3 read/list permissions for the created bucket (useful if you later want to pull content).
-- For a minimal challenge, we use **default VPC** and the first subnet. This is fine for a single-instance demo.
+- Uses default VPC and first subnet — fine for this single-instance demo.
+
+---
+
+## Troubleshooting
+
+- Terraform error: no matching VPC found
+  → Run aws ec2 create-default-vpc --region us-east-1 to create one.
+- SSH/Ansible ping fails
+  - Ensure Security Group allows your IP (allow_ssh_cidr)
+  - Confirm private key permissions: chmod 600 ~/.ssh/tc3
+  - Ensure correct user (ubuntu for Ubuntu AMIs)
+- Nginx not serving page
+  - SSH in: ssh -i ~/.ssh/tc3 ubuntu@<PUBLIC_IP>
+  - Check service: sudo systemctl status nginx
+  - Check page: sudo cat /var/www/html/index.html
