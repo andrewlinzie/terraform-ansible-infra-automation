@@ -75,7 +75,9 @@ User data scripts were avoided due to:
 - Poor maintainability for complex workflows
 - SSH-Based Configuration Model
 
-### SSH was used to enable:
+### SSH-Based Configuration
+
+SSH enables:
 - Secure access via key pairs
 - Remote configuration via Ansible inventory
 - Validation through manual SSH and Ansible ping
